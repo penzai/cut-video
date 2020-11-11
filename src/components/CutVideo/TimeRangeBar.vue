@@ -220,7 +220,6 @@ export default {
   height: 100%;
   div {
     flex: 1;
-    // border: 1px solid red;
   }
   video {
     object-fit: cover;
