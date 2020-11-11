@@ -1,5 +1,17 @@
 <template>
   <div ref="root" class="time-range-bar trb-wrapper">
+    <div class="video-frame">
+      <div v-for="item in frameCurrentTimes" :key="item">
+        <video
+          preload="metadata"
+          :currentTime="item"
+          src="/v2.mp4"
+          width="100%"
+          height="40"
+          :oncanplay="`this.currentTime = ${item}`"
+        ></video>
+      </div>
+    </div>
     <div
       class="content"
       :style="{
@@ -32,6 +44,7 @@ export default {
       default: 800
     }
   },
+  inject: ["root"],
   data() {
     return {
       sliderWidth: 14, //滑块宽度
@@ -39,7 +52,9 @@ export default {
       rootEnd: 0, //容器终止x
       contentLeft: 0, //内容条左向距离
       contentRight: 0, //内容条右向距离
-      isDraging: false
+      isDraging: false,
+
+      frameCurrentTimes: []
     };
   },
   watch: {
@@ -48,6 +63,16 @@ export default {
     },
     contentRight() {
       this.$emit("end-change", (this.width - this.contentRight) / this.width);
+    },
+    "root.videoDuration"(val) {
+      const count = 20;
+      const gap = val / count;
+      // 生成关键帧节点
+      this.frameCurrentTimes = Array(count)
+        .fill(1)
+        .map((v, i) => {
+          return i === count - 1 ? val : gap * i;
+        });
     }
   },
   mounted() {
@@ -69,7 +94,6 @@ export default {
           const len = e.pageX - this.rootStart;
           const min = 0;
           const max = this.width - this.contentRight - this.sliderWidth;
-          console.log(min, max, len);
           if (len < min) {
             this.contentLeft = min;
           } else if (len > max) {
@@ -137,6 +161,7 @@ export default {
   .left-edge,
   .right-edge {
     position: absolute;
+    top: 0;
     width: 14px;
     height: 100%;
     background: @theme-color;
@@ -170,11 +195,23 @@ export default {
   }
   .content {
     position: absolute;
+    top: 0;
     box-sizing: border-box;
     height: @bar-height;
     border-top: 2px solid @theme-color;
     border-bottom: 2px solid @theme-color;
     background: transparent;
+  }
+}
+.video-frame {
+  display: flex;
+  height: 100%;
+  div {
+    flex: 1;
+    // border: 1px solid red;
+  }
+  video {
+    object-fit: cover;
   }
 }
 </style>
