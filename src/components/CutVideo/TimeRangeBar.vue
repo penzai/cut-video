@@ -1,11 +1,11 @@
 <template>
-  <div ref="root" class="time-range-bar trb-wrapper">
+  <div ref="wrapper" class="time-range-bar trb-wrapper">
     <div class="video-frame">
       <div v-for="item in frameCurrentTimes" :key="item">
         <video
           preload="metadata"
           :currentTime="item"
-          src="/v2.mp4"
+          :src="dialog.url"
           width="100%"
           height="40"
           :oncanplay="`this.currentTime = ${item}`"
@@ -44,12 +44,12 @@ export default {
       default: 800
     }
   },
-  inject: ["root"],
+  inject: ["root", "dialog"],
   data() {
     return {
       sliderWidth: 14, //滑块宽度
-      rootStart: 0, //容器开始x
-      rootEnd: 0, //容器终止x
+      wrapperStart: 0, //容器开始x
+      wrapperEnd: 0, //容器终止x
       contentLeft: 0, //内容条左向距离
       contentRight: 0, //内容条右向距离
       isDraging: false,
@@ -76,22 +76,29 @@ export default {
     }
   },
   mounted() {
-    const $root = this.$refs.root;
-    this.rootStart = $root.getBoundingClientRect().x;
-    this.rootEnd = this.rootStart + this.width;
     this.bindLeftEvent();
     this.bindRightEvent();
   },
   methods: {
+    calulateWrapperRect() {
+      const $wrapper = this.$refs.wrapper;
+      this.wrapperStart = $wrapper.getBoundingClientRect().x;
+      this.wrapperEnd = this.wrapperStart + this.width;
+    },
     // 绑定左滑块
     bindLeftEvent() {
       const $left = this.$refs.left;
       const docMoveFunc = e => {
         window.requestAnimationFrame(() => {
           if (!this.isDraging) return; //已经停止拖动了，不再触发事件
-          this.$emit("start-drag-callback"); //暂停视频播放，移除循环播放事件
+          this.$emit("start-drag-callback"); //暂停视频播放，移除循环播放事件\
 
-          const len = e.pageX - this.rootStart;
+          // 获取wrapper位置
+          if (!this.wrapperStart) {
+            this.calulateWrapperRect();
+          }
+
+          const len = e.pageX - this.wrapperStart;
           const min = 0;
           const max = this.width - this.contentRight - this.sliderWidth;
           if (len < min) {
@@ -113,7 +120,12 @@ export default {
           if (!this.isDraging) return; //已经停止拖动了，不再触发事件
           this.$emit("start-drag-callback"); //暂停视频播放，移除循环播放事件
 
-          const len = this.rootEnd - e.pageX;
+          // 获取wrapper位置
+          if (!this.wrapperStart) {
+            this.calulateWrapperRect();
+          }
+
+          const len = this.wrapperEnd - e.pageX;
           const min = 0;
           const max = this.width - this.contentLeft - this.sliderWidth;
           if (len < min) {
