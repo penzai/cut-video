@@ -81,6 +81,9 @@ export default {
     this.videoDom.addEventListener("error", () => {
       this.dialog.isError = true;
     });
+    this.videoDom.addEventListener("canplay", () => {
+      this.dialog.isError = false;
+    });
   },
   methods: {
     getTimeText(t) {
