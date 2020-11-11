@@ -1,14 +1,18 @@
 <template>
   <div class="cut-video">
-    <video ref="video" src="/v2.mp4" controls width="800" height="450"></video>
+    <video ref="video" src="/v2.mp4" width="800" height="450"></video>
     <TimeRangeBar
       @start-change="handleStarChange"
       @end-change="handleEndChange"
       @start-drag-callback="removeVideoLoopEventListener"
     />
     <div class="oper-box">
-      <div class="btn-group">
-        <input type="button" value="预览" @click="handlePreview" />
+      <div class="preview-btn-group">
+        <Button type="primary" @click="handlePreview">预览</Button>
+        <span style="margin-left: 10px;font-size:12px;"
+          ><span v-show="isPlaying">{{ cutCurrentTimeText }} / </span
+          >{{ cutAllTimeText }}</span
+        >
       </div>
       <div class="time-info">
         <span
@@ -17,9 +21,10 @@
         <span
           >结束时间：<span class="time">{{ endTimeText }}</span></span
         >
+        <span>总时长：{{ Number.parseInt(cutAllTime) + 1 }} 秒</span>
       </div>
-      <div class="btn-group">
-        <input type="button" value="确定" />
+      <div class="btn-group" style="text-align: right;">
+        <Button type="primary" @click="handleConfirm">确定</Button>
       </div>
     </div>
   </div>
@@ -38,17 +43,28 @@ export default {
       videoDom: null,
       videoDuration: 0,
       startTime: 0,
-      endTime: 0
+      endTime: 0,
+
+      cutCurrentTime: 0, //裁剪视频当前播放时间
+      isPlaying: false //是否正在播放裁剪视频
     };
   },
   computed: {
     startTimeText() {
-      const t = dayjs(this.startTime * 1000 + 16 * 60 * 60 * 1000);
-      return t.format("HH:mm:ss");
+      return this.getTimeText(this.startTime);
     },
     endTimeText() {
-      const t = dayjs(this.endTime * 1000 + 16 * 60 * 60 * 1000);
-      return t.format("HH:mm:ss");
+      return this.getTimeText(this.endTime);
+    },
+    cutCurrentTimeText() {
+      return this.getTimeText(this.cutCurrentTime - this.startTime);
+    },
+    // 裁剪视频总长
+    cutAllTime() {
+      return this.endTime - this.startTime;
+    },
+    cutAllTimeText() {
+      return this.getTimeText(this.cutAllTime);
     }
   },
   mounted() {
@@ -58,6 +74,9 @@ export default {
     });
   },
   methods: {
+    getTimeText(t) {
+      return dayjs(t * 1000 + 16 * 60 * 60 * 1000).format("HH:mm:ss");
+    },
     handleStarChange(v) {
       this.startTime = this.videoDom.currentTime = Math.floor(
         this.videoDuration * v
@@ -72,16 +91,26 @@ export default {
       this.videoDom.currentTime = this.startTime;
       this.videoDom.addEventListener("timeupdate", this.loopPlay);
       this.videoDom.play();
+      this.isPlaying = true;
     },
     loopPlay() {
-      if (Math.floor(this.videoDom.currentTime) === this.endTime) {
+      const time = Math.floor(this.videoDom.currentTime);
+      this.cutCurrentTime = time;
+      if (time === this.endTime + 1) {
         this.videoDom.currentTime = this.startTime;
       }
     },
     // 移除video的循环播放判定
     removeVideoLoopEventListener() {
+      this.isPlaying = false;
       this.videoDom.pause();
       this.videoDom.removeEventListener("timeupdate", this.loopPlay);
+    },
+    handleConfirm() {
+      const len = this.endTime - this.startTime;
+      if (len < 9 || len > 12) {
+        this.$Message.error("只支持裁剪9秒到45秒的视频");
+      }
     }
   }
 };
@@ -98,20 +127,32 @@ export default {
 }
 .oper-box {
   display: flex;
+  height: 40px;
+  line-height: 40px;
+  margin-top: 20px;
+  .preview-btn-group {
+    width: 200px;
+  }
   .btn-group {
-    width: 100px;
+    width: 130px;
   }
   .time-info {
     flex: 1;
     text-align: center;
   }
-}
-.time-info {
-  margin-top: 20px;
-  font-size: 12px;
-  color: #999;
-  span {
-    margin-right: 20px;
+  .time-info {
+    font-size: 12px;
+    color: #999;
+    span {
+      margin-right: 20px;
+    }
+    .time {
+      padding: 10px;
+      background: #f7f7f7;
+      border-radius: 5px;
+      font-size: 16px;
+      color: #222;
+    }
   }
 }
 </style>
