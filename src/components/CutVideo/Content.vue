@@ -25,9 +25,6 @@
         >
         <span>总时长：{{ Number.parseInt(cutAllTime) + 1 }} 秒</span>
       </div>
-      <!-- <div class="btn-group" style="text-align: right;">
-        <Button type="primary" @click="handleConfirm">确定</Button>
-      </div> -->
     </div>
   </div>
 </template>
@@ -80,6 +77,9 @@ export default {
     this.videoDom = this.$refs.video;
     this.videoDom.addEventListener("loadedmetadata", () => {
       this.endTime = this.videoDuration = this.videoDom.duration;
+    });
+    this.videoDom.addEventListener("error", () => {
+      this.dialog.isError = true;
     });
   },
   methods: {
@@ -139,18 +139,19 @@ export default {
 
 <style lang="less" scoped>
 .cut-video {
-  width: 800px;
   margin: auto;
   position: relative;
+  text-align: center;
   video {
     margin-bottom: 15px;
   }
 }
 .oper-box {
   display: flex;
+  width: 800px;
   height: 40px;
   line-height: 40px;
-  margin-top: 20px;
+  margin: 20px auto;
   .preview-btn-group {
     width: 250px;
   }

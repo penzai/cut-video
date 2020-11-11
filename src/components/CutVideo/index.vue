@@ -4,7 +4,7 @@
       top: top + 'px'
     }"
     @input="val => $emit('update:visible', val)"
-    width="900"
+    :width="dialogWidth"
     title="裁剪视频"
     :value="visible"
   >
@@ -28,9 +28,23 @@ export default {
       dialog: this
     };
   },
+  computed: {
+    dialogWidth() {
+      const clientWidth = window.innerWidth;
+      const relativeWidth = clientWidth * 0.97;
+      return relativeWidth < 900 ? 900 : relativeWidth;
+    }
+  },
   props: {
     visible: Boolean,
     url: String
+  },
+  watch: {
+    visible(val) {
+      if (val && this.isError) {
+        this.$Message.error("视频地址有误，暂不能裁剪");
+      }
+    }
   },
   created() {
     this.top = (window.innerHeight - 720) / 2;
@@ -38,11 +52,16 @@ export default {
   data() {
     return {
       top: 0,
-      loading: false
+      loading: false,
+      isError: false
     };
   },
   methods: {
     handleConfirm() {
+      if (this.isError) {
+        this.$Message.error("视频地址有误，暂不能裁剪");
+        return;
+      }
       const { cutAllTime, startTime, endTime } = this.$refs.content;
       const all = Math.floor(cutAllTime);
       if (all < 7 || all > 48) {
