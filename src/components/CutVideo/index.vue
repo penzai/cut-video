@@ -37,7 +37,8 @@ export default {
   },
   props: {
     visible: Boolean,
-    url: String
+    url: String,
+    defaultCutInfo: [Object, null]
   },
   watch: {
     visible(val) {

@@ -23,7 +23,7 @@
         <span
           >结束时间：<span class="time">{{ endTimeText }}</span></span
         >
-        <span>总时长：{{ Number.parseInt(cutAllTime) + 1 }} 秒</span>
+        <span>总时长：{{ Number.parseInt(cutAllTime) }} 秒</span>
       </div>
     </div>
   </div>
@@ -73,10 +73,21 @@ export default {
       return this.getTimeText(this.cutAllTime);
     }
   },
+  watch: {
+    // 回显时间
+    "dialog.defaultCutInfo"(val) {
+      if (!val) return;
+      this.startTime = val.cutBeginTime;
+      this.endTime = val.cutEndTime;
+    }
+  },
   mounted() {
     this.videoDom = this.$refs.video;
     this.videoDom.addEventListener("loadedmetadata", () => {
-      this.endTime = this.videoDuration = this.videoDom.duration;
+      this.videoDuration = this.videoDom.duration;
+      if (!this.endTime) {
+        this.endTime = this.videoDuration;
+      }
     });
     this.videoDom.addEventListener("error", () => {
       this.dialog.isError = true;
