@@ -62,13 +62,22 @@ export default {
         this.$Message.error("视频地址有误，暂不能裁剪");
         return;
       }
-      const { cutAllTime, startTime, endTime } = this.$refs.content;
+      const {
+        cutAllTime,
+        startTime,
+        endTime,
+        startTimeText,
+        endTimeText
+      } = this.$refs.content;
       const all = Math.floor(cutAllTime);
       if (all < 7 || all > 48) {
         this.$Message.error("裁剪视频总时长需为7秒到48秒");
       } else {
         this.$emit("update:visible", false);
         this.$emit("confirm", {
+          cutAllTime,
+          cutBeginTimeText: startTimeText,
+          cutEndTimeText: endTimeText,
           cutBeginTime: Math.floor(startTime),
           cutEndTime: Math.floor(endTime)
         });
