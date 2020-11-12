@@ -23,7 +23,7 @@
         <span
           >结束时间：<span class="time">{{ endTimeText }}</span></span
         >
-        <span>总时长：{{ Number.parseInt(cutAllTime) + 1 }} 秒</span>
+        <span>总时长：{{ Number.parseInt(cutAllTime) }} 秒</span>
       </div>
     </div>
   </div>
