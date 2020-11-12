@@ -26,7 +26,6 @@ export default {
   },
 
   mounted() {
-    console.log(this.getSecondByF1("00:21401:12"));
     const startText = "00:00:03";
     const endText = "00:00:12";
     const start = this.getSecondByF1(startText);
