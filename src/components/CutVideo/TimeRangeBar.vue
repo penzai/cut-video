@@ -1,7 +1,7 @@
 <template>
   <div ref="wrapper" class="time-range-bar trb-wrapper">
     <div class="video-frame">
-      <div v-for="item in frameCurrentTimes" :key="item">
+      <!-- <div v-for="item in frameCurrentTimes" :key="item">
         <video
           preload="metadata"
           :currentTime="item"
@@ -10,7 +10,7 @@
           height="40"
           :oncanplay="`this.currentTime = ${item}`"
         ></video>
-      </div>
+      </div> -->
     </div>
     <div
       class="content"
