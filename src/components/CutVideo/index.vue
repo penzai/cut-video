@@ -37,12 +37,16 @@ export default {
   },
   props: {
     visible: Boolean,
-    url: String
+    url: String,
+    defaultCutInfo: [Object, null]
   },
   watch: {
     visible(val) {
       if (val && this.isError) {
         this.$Message.error("视频地址有误，暂不能裁剪");
+      }
+      if (val) {
+        this.$emit("init-default-data");
       }
     }
   },
@@ -75,9 +79,9 @@ export default {
       } else {
         this.$emit("update:visible", false);
         this.$emit("confirm", {
-          cutAllTime,
           cutBeginTimeText: startTimeText,
           cutEndTimeText: endTimeText,
+          cutAllTime: Math.floor(cutAllTime),
           cutBeginTime: Math.floor(startTime),
           cutEndTime: Math.floor(endTime)
         });

@@ -1,7 +1,7 @@
 <template>
   <div ref="wrapper" class="time-range-bar trb-wrapper">
     <div class="video-frame">
-      <div v-for="item in frameCurrentTimes" :key="item">
+      <!-- <div v-for="item in frameCurrentTimes" :key="item">
         <video
           preload="metadata"
           :currentTime="item"
@@ -10,7 +10,7 @@
           height="40"
           :oncanplay="`this.currentTime = ${item}`"
         ></video>
-      </div>
+      </div> -->
     </div>
     <div
       class="content"
@@ -72,6 +72,18 @@ export default {
   mounted() {
     this.bindLeftEvent();
     this.bindRightEvent();
+    this.dialog.$once("init-default-data", () => {
+      setTimeout(() => {
+        const defaultData = this.dialog.defaultCutInfo;
+        if (!defaultData) return;
+
+        this.calulateWrapperRect();
+        const { cutBeginTime, cutEndTime } = defaultData;
+        const duration = this.root.videoDuration;
+        this.contentRight = ((duration - cutEndTime) / duration) * this.width;
+        this.contentLeft = (cutBeginTime / duration) * this.width;
+      }, 1000);
+    });
   },
   methods: {
     calulateWrapperRect() {
