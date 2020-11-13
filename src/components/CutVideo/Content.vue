@@ -50,6 +50,7 @@ export default {
       startTime: 0,
       endTime: 0,
 
+      tempCutCurrentTime: 0, //缓存的当前时间，切换源使用
       cutCurrentTime: 0, //裁剪视频当前播放时间
       hasPlaying: false, //是否点击过播放
       isPlaying: false //是否正在播放裁剪视频
@@ -79,12 +80,17 @@ export default {
       if (!val) return;
       this.startTime = val.cutBeginTime;
       this.endTime = val.cutEndTime;
+    },
+    // 缓存当前时间
+    "dialog.url"() {
+      this.tempCutCurrentTime = this.cutCurrentTime;
     }
   },
   mounted() {
     this.videoDom = this.$refs.video;
     this.videoDom.addEventListener("loadedmetadata", () => {
       this.videoDuration = this.videoDom.duration;
+      this.videoDom.currentTime = this.tempCutCurrentTime; // 视频源切换时重置当前时间为开始时间
       if (!this.endTime) {
         this.endTime = this.videoDuration;
       }

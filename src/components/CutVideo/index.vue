@@ -31,7 +31,7 @@ export default {
   computed: {
     dialogWidth() {
       const clientWidth = window.innerWidth;
-      const relativeWidth = clientWidth * 0.97;
+      const relativeWidth = clientWidth * 0.75;
       return relativeWidth < 900 ? 900 : relativeWidth;
     }
   },
