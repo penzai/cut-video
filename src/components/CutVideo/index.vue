@@ -48,6 +48,9 @@ export default {
       if (val) {
         this.$emit("init-default-data");
       }
+      if (!val) {
+        this.$refs.content.handlePreview();
+      }
     }
   },
   created() {
